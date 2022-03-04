@@ -1,0 +1,10 @@
+datasets/boussinesq2d_vtk_u
+datasets/boussinesq2d_vtk_v
+datasets/.DS_Store
+datasets/data
+datasets/subset_u
+datasets/subset_v
+.vscode/
+results/
+build/
+.DS_Store
