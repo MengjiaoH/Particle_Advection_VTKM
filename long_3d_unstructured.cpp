@@ -68,55 +68,66 @@ int main(int argc, char **argv)
 {
     vtkm::Float32 step_size = 0.01;
     int num_seeds = 10;
-    std::string data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/boussinesq2d_vtk_u/U_00.00.vtk";
+    std::string data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/tangaroa3d_vtk/U/U_00.00.vtk";
     vtkSmartPointer<vtkUnstructuredGridReader> reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();  
-    double bounds[4];
+    double bounds[6];
     reader->SetFileName(data_dir.c_str());
     reader->Update();	
     mesh = reader->GetOutput();
     mesh->GetBounds(bounds); 
     vec2f x_range = vec2f(bounds[0], bounds[1]);
     vec2f y_range = vec2f(bounds[2], bounds[3]);
+    vec2f z_range = vec2f(bounds[4], bounds[5]);
     std::cout << "Bounds x : " << bounds[0] << " " << bounds[1] << std::endl;
     std::cout << "Bounds y : " << bounds[2] << " " << bounds[3] << std::endl;
+    std::cout << "Bounds z : " << bounds[4] << " " << bounds[5] << std::endl;
     // Place seeds
-    std::vector<vec2f> seeds = place_random_seeds_2d(x_range, y_range, num_seeds);
+    std::vector<vec3f> seeds = place_random_seeds_3d(x_range, y_range, z_range, num_seeds);
     std::cout << "Place " << seeds.size() << std::endl;
     for(int i = 0; i < seeds.size(); ++i){
-        std::cout << "seed " << i << ": [" << seeds[i].x << ", " << seeds[i].y  << "]" << std::endl;
+        std::cout << "seed " << i << ": [" << seeds[i].x << ", " << seeds[i].y  << ", " << seeds[i].z <<  "]" << std::endl;
     }
     num_seeds = seeds.size();
     // load vtk 
     // std::string u_data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/boussinesq2d_vtk_u/";
     // std::string v_data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/boussinesq2d_vtk_v/";
-    std::string u_data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/subset_u/";
-    std::string v_data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/subset_v/";
+    std::string u_data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/tangaroa3d_vtk/U/";
+    std::string v_data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/tangaroa3d_vtk/V/";
+    std::string w_data_dir = "/Users/hanmj/Desktop/projects/Partical_Advection/datasets/tangaroa3d_vtk/W/";
     std::vector<std::filesystem::path> u_filenames;
     std::vector<std::filesystem::path> v_filenames;
+    std::vector<std::filesystem::path> w_filenames;
     for (const auto& entry : std::filesystem::directory_iterator{u_data_dir}) {
         if (entry.is_regular_file() && (entry.path().extension() == ".vtk")) {
             u_filenames.push_back(entry.path().filename());
         }
     }
     std::sort(u_filenames.begin(), u_filenames.end(), [](const auto& lhs, const auto& rhs) { return lhs.string() < rhs.string();});
-        for (const auto& entry : std::filesystem::directory_iterator{v_data_dir}) {
+    for (const auto& entry : std::filesystem::directory_iterator{v_data_dir}) {
         if (entry.is_regular_file() && (entry.path().extension() == ".vtk")) {
             v_filenames.push_back(entry.path().filename());
         }
     }
     std::sort(v_filenames.begin(), v_filenames.end(), [](const auto& lhs, const auto& rhs) { return lhs.string() < rhs.string();});
+    for (const auto& entry : std::filesystem::directory_iterator{w_data_dir}) {
+        if (entry.is_regular_file() && (entry.path().extension() == ".vtk")) {
+            w_filenames.push_back(entry.path().filename());
+        }
+    }
+    std::sort(w_filenames.begin(), w_filenames.end(), [](const auto& lhs, const auto& rhs) { return lhs.string() < rhs.string();});
+    
     vtkm::cont::ArrayHandle<vtkm::Particle> seeds_current;
     seeds_current.Allocate(num_seeds);
-    std::vector<std::vector<vec2f>> all_fm;
+    std::vector<std::vector<vec3f>> all_fm;
     all_fm.push_back(seeds);
     // Set start seeds to seeds_current
     for(int i = 0; i < num_seeds; i++){
-        vec2f pt = seeds[i];
-        seeds_current.WritePortal().Set(i, vtkm::Particle(vtkm::Vec3f(static_cast<vtkm::FloatDefault>(pt.x), static_cast<vtkm::FloatDefault>(pt.y), 0), i));	
+        vec3f pt = seeds[i];
+        seeds_current.WritePortal().Set(i, vtkm::Particle(vtkm::Vec3f(static_cast<vtkm::FloatDefault>(pt.x), static_cast<vtkm::FloatDefault>(pt.y), static_cast<vtkm::FloatDefault>(pt.z)), i));	
     }
 
-    for(int f = 0; f < 1; ++f){
+    for(int f = 10; f < 11; ++f){
         /* ************************************************************* */
         // Load velocity u and v 
         /* ************************************************************* */
@@ -134,7 +145,7 @@ int main(int argc, char **argv)
         std::cout << "#Points in the data set: " << num_pts << "\n";
 
         std::string v_filename = v_data_dir + v_filenames[f].string();
-        std::cout << "filename V: " << v_filename << "\n";
+        // std::cout << "filename V: " << v_filename << "\n";
         vtkSmartPointer<vtkUnstructuredGridReader> v_reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
         vtkSmartPointer<vtkUnstructuredGrid> v_mesh = vtkSmartPointer<vtkUnstructuredGrid>::New(); 
         v_reader->SetFileName(v_filename.c_str());
@@ -142,13 +153,24 @@ int main(int argc, char **argv)
         v_mesh = v_reader->GetOutput(); 
         vtkAbstractArray* a2 = v_mesh->GetPointData()->GetArray("V"); 
         vtkFloatArray* att2 = vtkFloatArray::SafeDownCast(a2);
+
+        std::string w_filename = w_data_dir + w_filenames[f].string();
+        // std::cout << "filename V: " << v_filename << "\n";
+        vtkSmartPointer<vtkUnstructuredGridReader> w_reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
+        vtkSmartPointer<vtkUnstructuredGrid> w_mesh = vtkSmartPointer<vtkUnstructuredGrid>::New(); 
+        w_reader->SetFileName(w_filename.c_str());
+        w_reader->Update();	
+        w_mesh = w_reader->GetOutput(); 
+        vtkAbstractArray* a3 = w_mesh->GetPointData()->GetArray("W"); 
+        vtkFloatArray* att3 = vtkFloatArray::SafeDownCast(a3);
+
         vtkm::cont::ArrayHandle<vtkm::Vec<vtkm::FloatDefault, 3>> velocity_field;
         velocity_field.Allocate(num_pts);
         for(int i = 0; i < num_pts; i++){ 
             // For Debug
             // if (i < 10)
             //     std::cout << "uv: " << att1->GetTuple1(i) << " " << att2->GetTuple1(i) << "\n";
-            velocity_field.WritePortal().Set(i, vtkm::Vec<vtkm::FloatDefault, 3>(0.1,  0.1, 0)); 
+            velocity_field.WritePortal().Set(i, vtkm::Vec<vtkm::FloatDefault, 3>(0.1,  0.1, 0.1)); 
         }
         // Number of Cells in the data set
         int num_cells = v_mesh -> GetNumberOfCells();
@@ -165,23 +187,17 @@ int main(int argc, char **argv)
         for(int i = 0; i < num_cells; ++i){
             vtkIdType num = 0;
             vtkIdType* cellPointIds;
+            
             v_mesh ->GetCellPoints(i, num, cellPointIds);
+            // std::cout << num << std::endl;
             for(int j = 0; j < num; ++j){
                 connectivity.push_back(*(cellPointIds + j));
             }
             shapes.push_back(v_mesh -> GetCellType(i));
-            numIndices.push_back(4);
+            numIndices.push_back(num);
             if ((i > 15670) && (i < 15674)){
                 std::cout << "cell " << i << "\n";
-                std::cout << "cell id: " << *(cellPointIds + 0) << " " << *(cellPointIds + 1) << " "  << *(cellPointIds + 2) << " " << *(cellPointIds + 3) << "\n";
-                double* p0 = v_mesh ->GetPoint(*(cellPointIds + 0));
-                double* p1 = v_mesh ->GetPoint(*(cellPointIds + 1));
-                double* p2 = v_mesh ->GetPoint(*(cellPointIds + 2));
-                double* p3 = v_mesh ->GetPoint(*(cellPointIds + 3));
-                std::cout << "points 0: " << *(p0 + 0) << " " << *(p0 + 1)<<  " " << *(p0 + 2) << "\n";
-                std::cout << "points 1: " << p1[0] << " " << p1[1] <<  " " << p1[2] << "\n";
-                std::cout << "points 2: " << p2[0] << " " << p2[1] <<  " " << p2[2] << "\n";
-                std::cout << "points 3: " << p3[0] << " " << p3[1] <<  " " << p3[2] << "\n";
+                std::cout << "cell id: " << *(cellPointIds + 0) << " " << *(cellPointIds + 1) << " " << *(cellPointIds + 2) << " " << *(cellPointIds + 3) << "\n";
             }
         }
         
@@ -244,10 +260,10 @@ int main(int argc, char **argv)
             seeds_current.WritePortal().Set(i, vtkm::Particle(vtkm::Vec3f(static_cast<vtkm::FloatDefault>(pt[0]), static_cast<vtkm::FloatDefault>(pt[1]), static_cast<vtkm::FloatDefault>(pt[2])), i));	
         }
         // Save current seeds
-        std::vector<vec2f> current;
+        std::vector<vec3f> current;
         for(int i = 0; i < num_seeds; i++){
             auto pt = seeds_current.ReadPortal().Get(i).Pos;
-            current.push_back(vec2f(pt[0], pt[1]));
+            current.push_back(vec3f(pt[0], pt[1], pt[2]));
         }
         all_fm.push_back(current);
     }

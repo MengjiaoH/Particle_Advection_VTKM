@@ -40,3 +40,9 @@ target_link_libraries(long_2d_unstructured PRIVATE vtkm_cont vtkm_io ${VTKm_LIBR
 # target_compile_definitions(long_2d PRIVATE "VTKM_DEVICE_ADAPTER=VTKM_DEVICE_ADAPTER_SERIAL")
 target_compile_options(long_2d_unstructured PRIVATE ${VTKm_COMPILE_OPTIONS})
 
+add_executable(long_3d_unstructured long_3d_unstructured.cpp)
+
+target_include_directories(long_3d_unstructured PRIVATE ${VTKm_INCLUDE_DIRS})
+target_link_libraries(long_3d_unstructured PRIVATE vtkm_cont vtkm_io ${VTKm_LIBRARIES} ${VTK_LIBRARIES})
+# target_compile_definitions(long_2d PRIVATE "VTKM_DEVICE_ADAPTER=VTKM_DEVICE_ADAPTER_SERIAL")
+target_compile_options(long_3d_unstructured PRIVATE ${VTKm_COMPILE_OPTIONS})

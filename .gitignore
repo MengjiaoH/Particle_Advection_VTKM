@@ -2,6 +2,8 @@ datasets/boussinesq2d_vtk_u
 datasets/boussinesq2d_vtk_v
 datasets/.DS_Store
 datasets/data
+datasets/halfcylinder3d-Re160_vtk
+datasets/tangaroa3d_vtk
 datasets/subset_u
 datasets/subset_v
 .vscode/
