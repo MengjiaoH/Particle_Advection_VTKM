@@ -47,13 +47,14 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // -----------------------------------------------------------------------------
 
-#include <cstdlib> // *** Thanks to Leonhard Gruenschloss and Mike Giles   ***
-#include <cmath>   // *** for pointing out the change in new g++ compilers ***
+// #include <cstdlib> // *** Thanks to Leonhard Gruenschloss and Mike Giles   ***
+// #include <cmath>   // *** for pointing out the change in new g++ compilers ***
 
-#include <iostream>
-#include <iomanip>
-#include <fstream>
+// #include <iostream>
+// #include <iomanip>
+// #include <fstream>
 
+#include "sobol.h"
 using namespace std;
 
 // ----- SOBOL POINTS GENERATOR BASED ON GRAYCODE ORDER -----------------
@@ -73,8 +74,10 @@ using namespace std;
 
 double **sobol_points(unsigned N, unsigned D, char *dir_file)
 {
-  std::string filename = "/Users/hanmj/Desktop/projects/Partical_Advection/new-joe-kuo-6.21201";
-  ifstream infile(filename.c_str(), ios::in);
+  std::string file = "/home/mengjiao/Desktop/examples/Particle_Advection_VTKM/new-joe-kuo-6.21201";
+  // std::string file = "/Users/hanmj/Desktop/End_2_End_Flow_Vis/Data_Generation/new-joe-kuo-6.21201";
+  // std::string file = "/home/mengjiao/Desktop/projects/FM_Generation/generate_sobol_seeds/new-joe-kuo-6.21201";
+  ifstream infile(file.c_str(),ios::in);
   if (!infile) {
     cout << "Input file containing direction numbers cannot be found!\n";
     exit(1);
@@ -182,12 +185,12 @@ double **sobol_points(unsigned N, unsigned D, char *dir_file)
 //   int D = atoi(argv[2]);
 //   double **P = sobol_points(N,D,argv[3]); 
 
-//   // display points
-//   cout << setprecision(20);
-//   //cout << setiosflags(ios::scientific) << setprecision(10);
-//   for (unsigned i=0;i<=N-1;i++) {
-//     for (unsigned j=0;j<=D-1;j++) cout << P[i][j] << " " ;
-//     cout << endl;
-//   }
+//   // // display points
+//   // cout << setprecision(20);
+//   // //cout << setiosflags(ios::scientific) << setprecision(10);
+//   // for (unsigned i=0;i<=N-1;i++) {
+//   //   for (unsigned j=0;j<=D-1;j++) cout << P[i][j] << " " ;
+//   //   cout << endl;
+//   // }
 //   cout << endl;
 // }
