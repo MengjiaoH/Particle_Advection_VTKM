@@ -33,7 +33,10 @@ target_link_libraries(double_gyre_vtk PRIVATE vtkm_cont vtkm_io ${VTKm_LIBRARIES
 target_compile_options(double_gyre_vtk PRIVATE ${VTKm_COMPILE_OPTIONS})
 
 
-
+add_executable(FTLE_2D FTLE_2D.cpp)
+target_include_directories(FTLE_2D PRIVATE ${VTKm_INCLUDE_DIRS})
+target_link_libraries(FTLE_2D PRIVATE vtkm_cont vtkm_io ${VTKm_LIBRARIES} ${VTK_LIBRARIES} helpers)
+target_compile_options(FTLE_2D PRIVATE ${VTKm_COMPILE_OPTIONS})
 
 
 # add_executable(evaluate_long evaluate_long.cpp)
