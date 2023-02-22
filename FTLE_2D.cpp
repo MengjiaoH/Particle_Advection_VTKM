@@ -55,6 +55,12 @@ using namespace std::chrono;
 #include <vtkm/worklet/LagrangianStructures.h>
 #include <vtkm/worklet/particleadvection/Stepper.h>
 
+// Step 1: Compute the flow maps by placing uniformed seeds 
+// Step 2: Use the seeds' location at the first time step and the last time step. Replace the file at Line 67 and Line 71. 
+// Step 3: Change the dimensions and the filename at Line 77 and 79. 
+// Note: Line 89 to 110 are computing the bounds of the data. This part can also be replaced by reading directly from the data file. 
+// Step 4: Change the Line 112 and 113 according to the number steps and step size that are used for particle advection 
+// Step 5: Change the output directory Line 149
 
 using Vec3f = vtkm::Vec<vtkm::FloatDefault, 3>;
 using Vec2f = vtkm::Vec<vtkm::FloatDefault, 2>;
@@ -123,8 +129,8 @@ int main(int argc, char** argv)
     double x_origin;
     double y_origin;
     double z_origin;
-    std::cout << "origin: " << x_origin << " " << y_origin << " " << z_origin << "\n";
     mesh->GetOrigin(x_origin, y_origin, z_origin);
+    std::cout << "origin: " << x_origin << " " << y_origin << " " << z_origin << "\n";
     Vec2f out_origin2d(static_cast<vtkm::FloatDefault>(x_range.x),
                        static_cast<vtkm::FloatDefault>(y_range.x));
     Vec2f out_spacing2d(static_cast<vtkm::FloatDefault>(space_sx),
