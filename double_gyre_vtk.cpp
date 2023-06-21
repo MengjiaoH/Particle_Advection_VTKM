@@ -201,25 +201,25 @@ int main(int argc, char **argv)
         
         res_particles = particleadvection.Run(rk4, seeds_current, 1);
         auto particles = res_particles.Particles;
-        // update seeds_current
-        for(int i = 0; i < num_seeds; i++){
-            auto next = res_particles.Particles.ReadPortal().Get(i).Pos;
-            double pt[3];
-            pt[0] = next[0];
-            pt[1] = next[1];
-            pt[2] = next[2];
-            // if (i == 50){
-            //     std::cout << pt[0] << " " << pt[1] << " " << pt[2] <<  std::endl;
-            // }
-            seeds_current.WritePortal().Set(i, vtkm::Particle(Vec3f(static_cast<vtkm::FloatDefault>(pt[0]), static_cast<vtkm::FloatDefault>(pt[1]), static_cast<vtkm::FloatDefault>(pt[2])), i));	
-        }
+        // // update seeds_current
+        // for(int i = 0; i < num_seeds; i++){
+        //     auto next = res_particles.Particles.ReadPortal().Get(i).Pos;
+        //     double pt[3];
+        //     pt[0] = next[0];
+        //     pt[1] = next[1];
+        //     pt[2] = next[2];
+        //     // if (i == 50){
+        //     //     std::cout << pt[0] << " " << pt[1] << " " << pt[2] <<  std::endl;
+        //     // }
+        //     seeds_current.WritePortal().Set(i, vtkm::Particle(Vec3f(static_cast<vtkm::FloatDefault>(pt[0]), static_cast<vtkm::FloatDefault>(pt[1]), static_cast<vtkm::FloatDefault>(pt[2])), i));	
+        // }
         // Save current seeds
         if((f+1) % interval == 0){
             std::vector<vec3f> current;
             for(int i = 0; i < num_seeds; i++){
-                auto pt = seeds_current.ReadPortal().Get(i).Pos;
+                auto pt = particles.ReadPortal().Get(i).Pos;
                 current.push_back(vec3f(pt[0], pt[1], pt[2]));
-                pointCoordinates.push_back(vtkm::Vec3f_32(pt[0], pt[1], pt[2]));
+                // pointCoordinates.push_back(vtkm::Vec3f_32(pt[0], pt[1], pt[2]));
             }
             all_fm.push_back(current);
         }
