@@ -142,7 +142,7 @@ int main(int argc, char **argv)
         vtkFloatArray* att1 = vtkFloatArray::SafeDownCast(a1);
         // Number of Points in the  data set 
         int num_pts = u_mesh->GetNumberOfPoints();
-        std::cout << "#Points in the data set: " << num_pts << "\n";
+        // std::cout << "#Points in the data set: " << num_pts << "\n";
 
         std::string v_filename = v_data_dir + v_filenames[f].string();
         // std::cout << "filename V: " << v_filename << "\n";

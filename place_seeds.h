@@ -104,19 +104,17 @@ std::vector<vec3f> place_sobol_seeds_3d(vec2f x_range, vec2f y_range, vec2f z_ra
     return seeds;
 }
 
-std::vector<vec3f> place_sobol_seeds_2d(vec2f x_range, vec2f y_range, int num_seeds)
+std::vector<vec2f> place_sobol_seeds_2d(vec2f x_range, vec2f y_range, int num_seeds)
 {
-    std::vector<vec3f> seeds(num_seeds, vec3f(0, 0, 0));
+    std::vector<vec2f> seeds(num_seeds, vec2f(0, 0));
     // srand((unsigned) time(NULL));
     char* file;
     double **P = sobol_points(num_seeds, 2, file); 
     for(int i = 0; i < num_seeds; i++){
         float x = (x_range.y - x_range.x) * P[i][0] + x_range.x;
         float y = (y_range.y - y_range.x) * P[i][1] + y_range.x;
-        float z = 1.0;
         seeds[i].x = x;
         seeds[i].y = y;
-        seeds[i].z = z;
     }
     return seeds;
 }
@@ -145,11 +143,11 @@ std::vector<vec3f> load_seeds_from_file(std::string seeds_file, int num_seeds)
    return seeds;
 }
 
-std::vector<vec3f> place_uniform_seeds_2d(vec2f x_range, vec2f y_range, vec2i dims)
+std::vector<vec2f> place_uniform_seeds_2d(vec2f x_range, vec2f y_range, vec2i dims)
 {
     
     int num_seeds = dims.x * dims.y;
-    std::vector<vec3f> seeds(num_seeds, vec3f(0,0,0));
+    std::vector<vec2f> seeds(num_seeds, vec2f(0,0));
     float x_interval = (x_range.y - x_range.x) / (dims.x - 1);
     float y_interval = (y_range.y - y_range.x) / (dims.y - 1);
     for(int j = 0; j < dims.y; j++)
@@ -159,7 +157,7 @@ std::vector<vec3f> place_uniform_seeds_2d(vec2f x_range, vec2f y_range, vec2i di
 			int index = dims.x * j + i;
 			float x = i * x_interval + x_range.x;
 			float y = j * y_interval + y_range.x;
-            vec3f p = vec3f(x, y, 1.0);
+            vec2f p = vec2f(x, y);
             seeds[index] = p;
 		}
 	}
