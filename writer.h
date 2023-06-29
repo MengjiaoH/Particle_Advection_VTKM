@@ -2,7 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "place_seeds.h"
+#include "rkcommon/math/vec.h"
+using namespace rkcommon::math;
 
 void write_to_raw_2d(std::vector<std::vector<vec2f>> fms)
 {
