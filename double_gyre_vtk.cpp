@@ -65,17 +65,17 @@ int main(int argc, char **argv)
 {
     // load vtk 
     int num_seeds = 500;
-    vec2i seed_dims = vec2i(30, 90);
-    std::string mode = "sobol";
+    vec2i seed_dims = vec2i(20, 10);
+    std::string mode = "uniform";
     // Heated Cylinder
-    std::string fname = "/home/mengjiao/Desktop/datasets/flow_data/doublegyre2d_vti/doublegyre2d.vti";
-    std::string outfile = "/home/mengjiao/Desktop/datasets/flow_maps/double_gyre/fm_";
+    std::string fname = "/home/mengjiao/Desktop/Examples/Particle_Advection_VTKM/datasets/doublegyre2d_vti/doublegyre2d.vti";
+    std::string outfile = "/home/mengjiao/Desktop/Examples/Particle_Advection_VTKM/datasets/flow_maps/double_gyre/short/fm_";
     
 
     std::string seeds_file = "/home/mengjiao/Desktop/projects/Partical_Advection/result_data/cylinder2d_synthetic/0_1_100/adapted_seeds_45458.txt";
-    int interval = 1;
+    int interval = 10;
     int start_cycles = 0;
-    int stop_cycles = 512;
+    int stop_cycles = 500;
     
     float offset = 0.0f;
     int num_fm = (stop_cycles - start_cycles) / interval;
@@ -137,8 +137,9 @@ int main(int argc, char **argv)
     double x_origin;
     double y_origin;
     double z_origin;
-    std::cout << "origin: " << x_origin << " " << y_origin << " " << z_origin << "\n";
+    
     mesh->GetOrigin(x_origin, y_origin, z_origin);
+    std::cout << "origin: " << x_origin << " " << y_origin << " " << z_origin << "\n";
     
     vtkm::Id3 datasetDims(dims[0], dims[1], dims[2]);
     Vec3f origin3d(static_cast<vtkm::FloatDefault>(x_origin),
@@ -180,39 +181,37 @@ int main(int argc, char **argv)
     seeds_current.Allocate(num_seeds);
     std::vector<std::vector<vec3f>> all_fm;
     all_fm.push_back(seeds);
-    std::vector<vtkm::Vec3f_32> pointCoordinates;
-    std::vector<vtkm::UInt8> shapes;
-    std::vector<vtkm::IdComponent> numIndices;
-    std::vector<vtkm::Id> connectivity;
 
     // Set start seeds to seeds_current
-    for(int i = 0; i < num_seeds; i++){
-        vec3f pt = seeds[i];
-        seeds_current.WritePortal().Set(i, vtkm::Particle(Vec3f(static_cast<vtkm::FloatDefault>(pt.x), static_cast<vtkm::FloatDefault>(pt.y), static_cast<vtkm::FloatDefault>(pt.z)), i));	
-        // pointCoordinates.push_back(vtkm::Vec3f_32(pt.x, pt.y, pt.z));
-        // shapes.push_back(vtkm::CELL_SHAPE_POLY_LINE);		
-        // numIndices.push_back(2);
-    }
-    // std::cout << "debug" << std::endl;
+    // for(int i = 0; i < num_seeds; i++){
+    //     vec3f pt = seeds[i];
+    //     seeds_current.WritePortal().Set(i, vtkm::Particle(Vec3f(static_cast<vtkm::FloatDefault>(pt.x), static_cast<vtkm::FloatDefault>(pt.y), static_cast<vtkm::FloatDefault>(pt.z)), i));	
+    // }
+
     
     for(int f = start_cycles; f < stop_cycles; f++){
         // advection
         std::cout << f << "\n";
+        // Set start seeds to seeds_current
+        for(int i = 0; i < num_seeds; i++){
+            float t = f * step_size;
+            // auto next = particles.ReadPortal().Get(i).Pos;
+            // double pt[3];
+            // pt[0] = next[0];
+            // pt[1] = next[1];
+            // pt[2] = next[2];
+            // if (i == 50){
+            //     // std::cout << pt[0] << " " << pt[1] << " " << pt[2] <<  std::endl;
+            //     std::cout << seeds_current.ReadPortal().Get(i).Pos[0] <<  std::endl;
+            // }
+            vec3f pt = seeds[i];
+            seeds_current.WritePortal().Set(i, vtkm::Particle(Vec3f(static_cast<vtkm::FloatDefault>(pt[0]), static_cast<vtkm::FloatDefault>(pt[1]), static_cast<vtkm::FloatDefault>(t)), i));	
+        }
         
         res_particles = particleadvection.Run(rk4, seeds_current, 1);
         auto particles = res_particles.Particles;
-        // // update seeds_current
-        // for(int i = 0; i < num_seeds; i++){
-        //     auto next = res_particles.Particles.ReadPortal().Get(i).Pos;
-        //     double pt[3];
-        //     pt[0] = next[0];
-        //     pt[1] = next[1];
-        //     pt[2] = next[2];
-        //     // if (i == 50){
-        //     //     std::cout << pt[0] << " " << pt[1] << " " << pt[2] <<  std::endl;
-        //     // }
-        //     seeds_current.WritePortal().Set(i, vtkm::Particle(Vec3f(static_cast<vtkm::FloatDefault>(pt[0]), static_cast<vtkm::FloatDefault>(pt[1]), static_cast<vtkm::FloatDefault>(pt[2])), i));	
-        // }
+        
+        
         // Save current seeds
         if((f+1) % interval == 0){
             std::vector<vec3f> current;
@@ -237,5 +236,6 @@ int main(int argc, char **argv)
     // vtkm::io::VTKDataSetWriter writer(outputfile.c_str());
     // writer.WriteDataSet(outputDS);
     write_to_txt_vec3f(all_fm, outfile);
+    // void write_to_txt_vec3f(std::vector<std::vector<vec3f>> fms, std::string outfile)
     return 0;
 }

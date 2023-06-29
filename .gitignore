@@ -1,5 +1,6 @@
 datasets/boussinesq2d_vtk_u
 datasets/boussinesq2d_vtk_v
+datasets/
 datasets/.DS_Store
 datasets/data
 datasets/halfcylinder3d-Re160_vtk

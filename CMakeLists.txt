@@ -26,6 +26,7 @@ add_library(helpers writer.cpp
 	            place_seeds.cpp
 	            sobol.cpp)
 target_link_libraries(helpers PRIVATE TBB::tbb rkcommon::rkcommon)
+
 add_executable(double_gyre_vtk double_gyre_vtk.cpp)
 target_include_directories(double_gyre_vtk PRIVATE ${VTKm_INCLUDE_DIRS})
 target_link_libraries(double_gyre_vtk PRIVATE vtkm_cont vtkm_io ${VTKm_LIBRARIES} ${VTK_LIBRARIES} TBB::tbb rkcommon::rkcommon helpers)
@@ -35,7 +36,7 @@ target_compile_options(double_gyre_vtk PRIVATE ${VTKm_COMPILE_OPTIONS})
 
 add_executable(FTLE_2D FTLE_2D.cpp)
 target_include_directories(FTLE_2D PRIVATE ${VTKm_INCLUDE_DIRS})
-target_link_libraries(FTLE_2D PRIVATE vtkm_cont vtkm_io ${VTKm_LIBRARIES} ${VTK_LIBRARIES} helpers)
+target_link_libraries(FTLE_2D PRIVATE vtkm_cont vtkm_io ${VTKm_LIBRARIES} ${VTK_LIBRARIES} helpers rkcommon::rkcommon)
 target_compile_options(FTLE_2D PRIVATE ${VTKm_COMPILE_OPTIONS})
 
 

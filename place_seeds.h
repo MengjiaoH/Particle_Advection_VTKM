@@ -25,6 +25,8 @@ std::vector<vec3f> place_on_boundary_2d(vec2f x_range, vec2f y_range, vec2i samp
 
 std::vector<vec3f> load_seeds_from_file(std::string seeds_file, int num_seeds, bool z_zeros);
 
+std::vector<vec2f> place_sobol_seeds_2d_0(vec2f x_range, vec2f y_range, int num_seeds);
+
 // std::vector<vec2f> place_sobol_seeds_2d(vec2f x_range, vec2f y_range, int num_seeds)
 // {
 //     std::vector<vec2f> seeds(num_seeds, vec2f(0, 0));
