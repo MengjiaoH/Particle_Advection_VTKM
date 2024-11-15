@@ -69,26 +69,17 @@ int main(int argc, char **argv)
     std::string mode = "uniform";
     // Heated Cylinder
     std::string fname = "/home/mengjiao/Desktop/Examples/Particle_Advection_VTKM/datasets/doublegyre2d_vti/doublegyre2d.vti";
-    std::string outfile = "/home/mengjiao/Desktop/Examples/Particle_Advection_VTKM/datasets/flow_maps/double_gyre/short/fm_";
+    std::string outfile = "/home/mengjiao/Desktop/Examples/Particle_Advection_VTKM/datasets/flow_maps/double_gyre/fm_";
     
-
-    std::string seeds_file = "/home/mengjiao/Desktop/projects/Partical_Advection/result_data/cylinder2d_synthetic/0_1_100/adapted_seeds_45458.txt";
     int interval = 10;
     int start_cycles = 0;
     int stop_cycles = 500;
-    
-    float offset = 0.0f;
     int num_fm = (stop_cycles - start_cycles) / interval;
-    // Heated Cylinder
+
     vtkm::Float32 step_size = 10.f / 511.f;
     std::cout << "step size: " << step_size << "\n";
     int dims[3] = {256, 128, 512};
-    // Cylinder Flow with von Karmen Vortex Street
-    // vtkm::Float32 step_size = 0.01;
-    // int dims[3] = {640, 80, 1501};
-    // Cylinder Flow Synthetic
-    // vtkm::Float32 step_size = (5.535 - 1.107) / (500 - 1);
-    // int dims[3] = {450, 200, 500};
+
     // Read Bounds
     vtkSmartPointer<vtkXMLImageDataReader> reader = vtkSmartPointer<vtkXMLImageDataReader>::New();
     double bounds[6];
@@ -99,12 +90,14 @@ int main(int argc, char **argv)
     mesh->GetBounds(bounds); 
     std::cout << "Number of points: " << mesh->GetNumberOfPoints() << std::endl;
     
-    vec2f x_range = vec2f(bounds[0] + offset, bounds[1] - offset);
-    vec2f y_range = vec2f(bounds[2] + offset, bounds[3] - offset);
+    vec2f x_range = vec2f(bounds[0], bounds[1]);
+    vec2f y_range = vec2f(bounds[2], bounds[3]);
     vec2f z_range = vec2f(bounds[4], bounds[5]);
     std::cout << "Bounds x : " << bounds[0] << " " << bounds[1] << std::endl;
     std::cout << "Bounds y : " << bounds[2] << " " << bounds[3] << std::endl;
     std::cout << "Bounds z : " << bounds[4] << " " << bounds[5] << std::endl;
+
+
     std::vector<vec3f> seeds;
     if (mode == "uniform"){
         seeds = place_uniform_seeds_2d(x_range, y_range, seed_dims, z_range.x);
@@ -223,18 +216,7 @@ int main(int argc, char **argv)
             all_fm.push_back(current);
         }
     }
-    // for(int i = 0; i < num_seeds; i++){
-	//     for(int n = 0; n < (num_fm+1); n++){
-    //         // std::cout << i << " " << n << " " << (n * num_seeds) + i << "\n";
-	// 	    connectivity.push_back((n*num_seeds)+i);
-    //     }
-    // }
-    // std::string outputfile = "heatedcylinder_test.vtk";
-    // vtkm::cont::DataSetBuilderExplicit dataSetBuilder;
-    // vtkm::cont::DataSet outputDS = dataSetBuilder.Create(pointCoordinates, shapes, numIndices, connectivity);
 
-    // vtkm::io::VTKDataSetWriter writer(outputfile.c_str());
-    // writer.WriteDataSet(outputDS);
     write_to_txt_vec3f(all_fm, outfile);
     // void write_to_txt_vec3f(std::vector<std::vector<vec3f>> fms, std::string outfile)
     return 0;
